@@ -95,6 +95,46 @@ def scrape_and_save(url_list):
         
     print("You've saved the scraped data to your postgres database.") 
 
+#Create show single talk chart function
+def show_single_talk_chart():
+    df = pd.read_sql("SELECT * FROM general_conference", engine)
+    #create dictionary
+    num_dict = {}
+
+    #loop through each row in database
+    print("The following are the names of speakers and thier talks:")
+    for row, num_rows in df.iterrows():
+        print(f"{row + 1}: {num_rows["Speaker_Name"]} - {num_rows["Talk_Name"]}")
+        #add display number and row index to dictionary
+        num_dict[row + 1] = row
+
+    #user input for talk they want to see and convert to integer
+    talk_input = input("Please enter the number of the talk you want to see summarized:")
+    talk_input = int(talk_input)
+
+    #look up row in dictionary
+    selected_row = df.loc[num_dict[talk_input]]
+
+    #grab talk name from selected row
+    talk_name = selected_row["Talk_Name"]
+
+    #drop non scripture column from selected row
+    scripture_counts = selected_row.drop(labels = ["Speaker_Name", "Talk_Name", "Kicker"])
+
+    #only keep books with one reference
+    scripture_counts = scripture_counts[scripture_counts >= 1]
+
+    #plot bar chart
+    plot.bar(scripture_counts.index, scripture_counts.values)
+    plot.title(f"Standard Works Referenced in: {talk_name}")
+    plot.xlabel("Standard Works Books")
+    plot.ylabel("# Times Referenced")
+    #rotate label so no overlap
+    plot.xticks(rotation=45, ha='right')  
+    #ensure nothing gets cut off
+    plot.tight_layout()  
+    plot.show()
+
 # User input menu
 def menu():
     choice = input("If you want to scrape data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program: ")
@@ -107,7 +147,7 @@ def menu():
         if choice == "1":
             pass  # Person 3 — call show_all_talks_chart() here
         elif choice == '2':
-            pass  # Person 4 — call show_single_talk_chart() here
+            show_single_talk_chart() # Person 4 — call show_single_talk_chart() here
         else:
             print("Closing the program.")
     else:
@@ -116,4 +156,3 @@ def menu():
 if __name__ == "__main__":
     menu()  
 
-    
