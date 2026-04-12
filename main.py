@@ -1,5 +1,5 @@
 # P4 General Conference Webscraper
-# Hunter Potter, Eugene Son, Penina Strong, Erik Peterson
+# Hunter Potter, Eugenie Son, Penina Strong, Erik Peterson
 
 # Imports
 from bs4 import BeautifulSoup
