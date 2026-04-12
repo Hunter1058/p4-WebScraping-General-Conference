@@ -95,6 +95,33 @@ def scrape_and_save(url_list):
         
     print("You've saved the scraped data to your postgres database.") 
 
+def show_all_talks_chart():
+    # Displays a bar chart showing total scripture references across all talks.
+
+    # Load data from database
+    df = pd.read_sql("SELECT * FROM general_conference", engine)
+
+    # Remove non-scripture columns
+    df = df.drop(columns=["Speaker_Name", "Talk_Name", "Kicker"])
+
+    # Sum all references across talks
+    totals = df.sum()
+
+    # Keep only books with more than 2 references
+    totals = totals[totals > 2]
+
+    # Create bar chart
+    plot.figure(figsize=(12, 6))
+    totals.plot(kind='bar')
+
+    plot.title("Standard Works Referenced in General Conference")
+    plot.xlabel("Standard Works Books")
+    plot.ylabel("# Times Referenced")
+
+    plot.xticks(rotation=45, ha='right')
+    plot.tight_layout()
+    plot.show()
+
 #Create show single talk chart function
 def show_single_talk_chart():
     df = pd.read_sql("SELECT * FROM general_conference", engine)
@@ -145,7 +172,7 @@ def menu():
     elif choice == '2':
         choice = input("You selected to see summaries. Enter 1 to see a summary of all talks. Enter 2 to select a specific talk. Enter anything else to exit: ")
         if choice == "1":
-            pass  # Person 3 — call show_all_talks_chart() here
+            show_all_talks_chart()  # Person 3 — call show_all_talks_chart() here
         elif choice == '2':
             show_single_talk_chart() # Person 4 — call show_single_talk_chart() here
         else:
